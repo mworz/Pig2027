@@ -14,7 +14,20 @@
 //  In the real game, the first player to reach 100 points wins.
 //
 
+
 import SwiftUI
+
+extension Color {
+    static let jokerGreen = Color(red: 0.0, green: 0.8, blue: 0.2)
+}
+
+struct DeinName: View {
+    var body: some View {
+        VStack {
+            // dein Inhalt
+        }
+    }
+}
 
 // Each player has their own colour.
 // TRY: Change these two colours. Try Color.purple, Color.green or Color.pink.
@@ -40,6 +53,8 @@ struct PigView: View {
 
     // Whose turn it is: 1 or 2.
     @State var currentPlayer: Int = 1
+    
+    @State var dieRotation: Double = 0
 
     // The colour of whoever's turn it is.
     @State var turnColor: Color = playerOneColor
@@ -61,32 +76,40 @@ struct PigView: View {
                 Text("Pig")
             }
             .font(.largeTitle)
+            .foregroundStyle(Color.white)
+            
             .bold()
 
             // The scoreboard: one card for each player.
             HStack(spacing: 16) {
                 VStack {
                     Text("Player 1")
-                        .font(.headline)
-                    Text("\(playerOneScore)")
-                        .font(.system(size: 48, weight: .bold))
-                        .monospacedDigit()
+                        .font(.system(size: 32, weight: .bold))
+                            .foregroundStyle(Color.purple)
+                        Text("\(playerOneScore)")
+                            .font(.system(size: 48, weight: .bold))
+                            .monospacedDigit()
+                            .foregroundStyle(Color.purple)
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(playerOneColor.opacity(0.2))
+                .background(
+                    Color.white)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
 
                 VStack {
                     Text("Player 2")
-                        .font(.headline)
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundStyle(Color.purple, .black)
                     Text("\(playerTwoScore)")
                         .font(.system(size: 48, weight: .bold))
                         .monospacedDigit()
+                        .foregroundStyle(Color.purple)
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(playerTwoColor.opacity(0.2))
+                .background(
+                    Color.white)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
             }
 
@@ -96,18 +119,22 @@ struct PigView: View {
             Text("Player \(currentPlayer), your turn")
                 .font(.title)
                 .bold()
-                .foregroundStyle(turnColor)
+              
+                .foregroundStyle(Color.white)
 
             // The die.
             // TRY: Change the size of the die from 120 to something bigger or smaller.
             Image(systemName: dieSymbol)
                 .font(.system(size: 120))
-                .foregroundStyle(turnColor)
+              
+                .rotationEffect(.degrees(dieRotation))
+                .foregroundStyle(Color.white)
 
             Text("Turn total: \(turnTotal)")
                 .font(.title2)
                 .bold()
                 .monospacedDigit()
+                .foregroundStyle(Color.white)
 
             Text(message)
                 .font(.headline)
@@ -122,8 +149,13 @@ struct PigView: View {
             HStack(spacing: 16) {
                 Button("Roll", systemImage: "dice") {
                     rollDie()
+                    withAnimation(.easeOut(duration: 0.6)) {
+                        dieRotation += 360
+                    }
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(Color.white)
+                .foregroundStyle(Color.purple)
 
                 Button("Hold", systemImage: "hand.raised.fill") {
                     hold()
@@ -133,7 +165,7 @@ struct PigView: View {
             .font(.title2)
             .bold()
             .controlSize(.large)
-            .tint(turnColor)
+           
 
             Button("New Game") {
                 startNewGame()
@@ -141,8 +173,16 @@ struct PigView: View {
         }
         .padding(32)
         .fontDesign(.rounded)
-        // How big the game's window is on the Mac. It can be made taller or wider.
+        .foregroundColor(.white)
         .frame(minWidth: 480, minHeight: 680)
+        .background(
+            LinearGradient(
+                colors: [.purple, .black],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+        )
     }
 
     // MARK: - Functions
@@ -203,7 +243,58 @@ struct PigView: View {
         message = "Player 1 goes first. Click Roll to start."
     }
 }
+struct StartView: View {
+
+    @State var gameStarted: Bool = false
+
+    var body: some View {
+        if gameStarted {
+            PigView()
+        } else {
+            VStack(spacing: 24) {
+                Spacer()
+
+                Image(systemName: "dice.fill")
+                    .font(.system(size: 100))
+                    .foregroundStyle(Color.white)
+
+                Text("Pig")
+                    .font(.system(size: 64, weight: .bold))
+
+                Text("Roll the dice, a 1 is not nice :)")
+                    .font(.title3)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(Color.white)
+
+                Button("Start Game", systemImage: "play.fill") {
+                    gameStarted = true
+                    
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .font(.title2)
+                .tint(Color.white)
+                
+
+
+                Spacer()
+            }
+            .padding(32)
+            .fontDesign(.rounded)
+            .foregroundColor(.white)
+            .frame(minWidth: 480, minHeight: 680)
+            .background(
+                LinearGradient(
+                    colors: [.purple, .black],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+            )
+        }
+    }
+}
 
 #Preview {
-    PigView()
+    StartView()
 }
